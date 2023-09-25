@@ -40,7 +40,12 @@
 
 pipeline {
     agent any
-    
+
+    // Define your Docker Hub registry URL
+    environment {
+        registry = 'manideep183/myflaskapi' // Your Docker Hub repository URL
+        registryCredential = 'dockerhub_credentials' // Your Docker Hub credentials ID
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -49,37 +54,50 @@ pipeline {
             }
         }
         
-        stage('Build and Push Docker Image') {
+    // Building Docker images
+        stage('Building image') {
             steps {
-                bat 'docker build -t myflaskapi:v1 .'
+                script {
+                    // Build the Docker image
+                    dockerImage = docker.build registry + ':v1'
+                }
+            }
+        }
+        
+        // Uploading Docker images into Docker Hub
+        stage('Upload Image') {
+            steps {
+                script {
+                    docker.withRegistry('', registryCredential) {
+                        dockerImage.push()
+                    }
+                }
             }
         }
         
         stage('Deploy') {
-    steps {
-        // Deploy the Docker container in a Windows batch script
-        bat 'docker run -d -p 5000:5000 --name my-flask-api myflaskapi:v1'
-    }
-}
-
-
-      stage('Test') {
             steps {
-        // Run the command using 'bat' step
-        bat 'docker exec my-flask-api python3 test_api.py'
+                // Deploy the Docker container in a Windows batch script
+                bat 'docker run -d -p 5000:5000 --name my-flask-api ' + registry + ':v1'
+            }
         }
-    }
 
+        stage('Test') {
+            steps {
+                // Run the command using 'bat' step
+                bat 'docker exec my-flask-api python3 test_api.py'
+            }
+        }
     }
     
     post {
-    always {
-        // Cleanup: Stop and remove the Docker container
-        bat "docker stop my-flask-api"
-        bat "docker rm my-flask-api"
+        always {
+            // Cleanup: Stop and remove the Docker container
+            bat "docker stop my-flask-api"
+            bat "docker rm my-flask-api"
 
-        // Cleanup: Remove Docker image
-        bat "docker rmi myflaskapi:v1" 
+            // Cleanup: Remove Docker image
+            bat "docker rmi " + registry + ':v1'
+        }
     }
-}
 }
