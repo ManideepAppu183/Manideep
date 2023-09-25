@@ -56,26 +56,30 @@ pipeline {
         }
         
         stage('Deploy') {
-            steps {
-        // Deploy the Docker container using docker-compose in a Windows batch script
-        bat 'docker-compose up'
-        }
+    steps {
+        // Deploy the Docker container in a Windows batch script
+        bat 'docker run -d -p 5000:5000 --name my-flask-api myflaskapi:v1'
     }
+}
+
 
       stage('Test') {
             steps {
         // Run the command using 'bat' step
-        bat 'docker exec rest-api python3 test_api.py'
+        bat 'docker exec my-flask-api python3 test_api.py'
         }
     }
 
     }
     
     post {
-        always {
-            // Cleanup: Remove Docker containers and images
-            bat "docker-compose down"
-            bat "docker rmi myflaskapi:v1" 
-        }
+    always {
+        // Cleanup: Stop and remove the Docker container
+        bat "docker stop my-flask-api"
+        bat "docker rm my-flask-api"
+
+        // Cleanup: Remove Docker image
+        bat "docker rmi myflaskapi:v1" 
     }
+}
 }
