@@ -57,16 +57,18 @@ pipeline {
         
         stage('Deploy') {
             steps {
-                // Deploy the Docker container
-               bat 'docker-compose up -d'
-            }
+        // Deploy the Docker container using docker-compose in a Windows batch script
+        bat 'docker-compose up'
         }
+    }
 
       stage('Test') {
             steps {
-                bat 'python test_api.py'
-            }
+        // Run the command using 'bat' step
+        bat 'docker exec rest-api python3 test_api.py'
         }
+    }
+
     }
     
     post {
