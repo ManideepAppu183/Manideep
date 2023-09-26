@@ -38,6 +38,8 @@
 //     }
 // }
 
+
+
 pipeline {
     agent any
 
@@ -45,6 +47,7 @@ pipeline {
     environment {
         registry = 'manideep183/myflaskapi' // Your Docker Hub repository URL
         registryCredential = 'dockerhub_credentials' // Your Docker Hub credentials ID
+        sonarqubeScanner = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
     }
     stages {
         stage('Checkout') {
@@ -71,6 +74,16 @@ pipeline {
                     docker.withRegistry('', registryCredential) {
                         dockerImage.push()
                     }
+                }
+            }
+        }
+
+        // Analyze code with SonarQube
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQubeServer') {
+                    // Execute the SonarQube Scanner
+                    bat "\"${tool name: 'SonarQubeScanner'}/bin/sonar-scanner.bat\""
                 }
             }
         }
