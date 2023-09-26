@@ -48,6 +48,8 @@ pipeline {
         registry = 'manideep183/myflaskapi' // Your Docker Hub repository URL
         registryCredential = 'dockerhub_credentials' // Your Docker Hub credentials ID
         sonarqubeScanner = tool name: 'SonarQubeScanner', type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+        SONAR_TOKEN = 'sqp_b83beec92b173dc7098bb550fa7e75e34caff305' // Replace with your actual SonarQube token
+        SONAR_PROJECT_KEY = 'Flask_Docker_Jenkins' // Replace with your actual SonarQube project key
     }
     stages {
         stage('Checkout') {
