@@ -1,0 +1,16 @@
+{
+  "name": "html_css_js_assignment",
+  "version": "1.0.0",
+  "description": "js application",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "manideep",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2"
+  }
+}
